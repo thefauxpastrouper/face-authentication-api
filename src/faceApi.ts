@@ -8,7 +8,7 @@ faceapi.env.monkeyPatch({ Canvas, Image, ImageData } as any);
 export async function loadModels() {
   const modelPath = path.resolve(process.cwd(), 'node_modules/@vladmandic/face-api/model');
   console.log(`Loading face-api models from ${modelPath}`);
-  
+
   await Promise.all([
     faceapi.nets.ssdMobilenetv1.loadFromDisk(modelPath),
     faceapi.nets.faceLandmark68Net.loadFromDisk(modelPath),
@@ -19,9 +19,9 @@ export async function loadModels() {
 
 export async function getFaceDescriptor(buffer: Buffer): Promise<Float32Array | null> {
   const img = await canvas.loadImage(buffer);
-  
+
   const detection = await faceapi.detectSingleFace(img as any).withFaceLandmarks().withFaceDescriptor();
-  
+
   if (!detection) {
     return null;
   }

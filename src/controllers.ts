@@ -51,7 +51,12 @@ export async function register(req: Request, res: Response): Promise<any> {
 
 export async function authenticate(req: Request, res: Response): Promise<any> {
   try {
+    const { email } = req.body;
     const file = req.file;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required.' });
+    }
 
     if (!file) {
       return res.status(400).json({ success: false, message: 'Photo is required.' });
@@ -67,8 +72,7 @@ export async function authenticate(req: Request, res: Response): Promise<any> {
     const matches = await prisma.$queryRaw<any[]>`
       SELECT id, name, email, "faceDescriptor" <-> ${descriptorStr}::vector as distance
       FROM "User"
-      ORDER BY distance ASC
-      LIMIT 1
+      WHERE email = ${email}
     `;
 
     if (matches.length === 0) {
@@ -89,7 +93,7 @@ export async function authenticate(req: Request, res: Response): Promise<any> {
     } else {
       return res.status(401).json({
         success: false,
-        message: 'Face does not match any user',
+        message: 'Face does not match the provided email',
         distance,
       });
     }
