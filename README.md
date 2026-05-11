@@ -5,7 +5,7 @@ This repository contains the backend implementation for a Face Registration and 
 ## 🚀 Setup Instructions
 
 ### Prerequisites
-- Node.js (v18+) or [Bun](https://bun.sh/)
+- [Bun](https://bun.sh/)
 - Docker and Docker Compose
 - PostgreSQL (via Docker)
 
@@ -38,8 +38,6 @@ bunx prisma generate
 Start the backend server:
 ```bash
 bun run dev
-# or
-npm run dev
 ```
 The server will start on `http://localhost:3000`.
 
