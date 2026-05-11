@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  postgres-for-assignment:
+    image: pgvector/pgvector:pg15
+    container_name: postgres-for-assignment
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: face_recognition
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

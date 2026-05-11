@@ -1,0 +1,19 @@
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "debian-openssl-3.0.x"] // used to resolve this error PrismaClientInitializationError: Query engine binary not found
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [vector]
+}
+
+model User {
+  id             String                     @id @default(uuid())
+  name           String
+  email          String                     @unique
+  faceDescriptor Unsupported("vector(128)")
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+}
