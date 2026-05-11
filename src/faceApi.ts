@@ -18,12 +18,17 @@ export async function loadModels() {
 }
 
 export async function getFaceDescriptor(buffer: Buffer): Promise<Float32Array | null> {
-  const img = await canvas.loadImage(buffer);
+  try {
+    const img = await canvas.loadImage(buffer);
 
-  const detection = await faceapi.detectSingleFace(img as any).withFaceLandmarks().withFaceDescriptor();
+    const detection = await faceapi.detectSingleFace(img as any).withFaceLandmarks().withFaceDescriptor();
 
-  if (!detection) {
+    if (!detection) {
+      return null;
+    }
+    return detection.descriptor;
+  } catch (error) {
+    console.error('Error processing face descriptor:', error);
     return null;
   }
-  return detection.descriptor;
 }
