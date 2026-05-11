@@ -2,6 +2,7 @@
 
 This repository contains the backend implementation for a Face Registration and Authentication system, built for the AI/ML Intern Assignment.
 
+![Architecture Diagram](./assignment.png)
 ## 🚀 Setup Instructions
 
 ### Prerequisites
