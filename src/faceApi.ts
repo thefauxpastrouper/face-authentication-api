@@ -1,3 +1,4 @@
+import '@tensorflow/tfjs-node-gpu';
 import * as canvas from 'canvas';
 import * as faceapi from '@vladmandic/face-api';
 import path from 'path';
@@ -21,7 +22,8 @@ export async function getFaceDescriptor(buffer: Buffer): Promise<Float32Array | 
   try {
     const img = await canvas.loadImage(buffer);
 
-    const detection = await faceapi.detectSingleFace(img as any).withFaceLandmarks().withFaceDescriptor();
+    const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.1 });
+    const detection = await faceapi.detectSingleFace(img as any, options).withFaceLandmarks().withFaceDescriptor();
 
     if (!detection) {
       return null;
