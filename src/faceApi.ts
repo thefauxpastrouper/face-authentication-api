@@ -1,4 +1,3 @@
-import '@tensorflow/tfjs-node-gpu';
 import * as canvas from 'canvas';
 import * as faceapi from '@vladmandic/face-api';
 import path from 'path';

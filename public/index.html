@@ -3,82 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CelebA Face Auth Dashboard</title>
+    <title>CelebA Face Auth Evaluation Dashboard</title>
+    <!-- Google Fonts: Outfit (Header/Metrics) & Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-color: #0f172a;
+            --bg-color: #080c14;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --card-hover-bg: rgba(28, 37, 54, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-hover-color: rgba(255, 255, 255, 0.16);
             --text-color: #f8fafc;
-            --card-bg: #1e293b;
-            --border-color: #334155;
-            --accent-primary: #3b82f6;
-            --accent-danger: #ef4444;
-            --accent-success: #22c55e;
-            --accent-warning: #f59e0b;
+            --text-muted: #64748b;
+            --text-secondary: #94a3b8;
+            
+            --accent-tp: #10b981;
+            --accent-tn: #059669;
+            --accent-fp: #ef4444;
+            --accent-fn: #f59e0b;
+            --accent-errors: #8b5cf6;
+            
+            --glow-tp: rgba(16, 185, 129, 0.15);
+            --glow-tn: rgba(5, 150, 105, 0.15);
+            --glow-fp: rgba(239, 68, 68, 0.15);
+            --glow-fn: rgba(245, 158, 11, 0.15);
+            --glow-errors: rgba(139, 92, 246, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+                radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.04) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
             color: var(--text-color);
             margin: 0;
             padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
         }
 
         header {
-            background-color: var(--card-bg);
+            background: rgba(8, 12, 20, 0.8);
+            backdrop-filter: blur(12px);
             padding: 1.5rem 2rem;
             border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 40;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: -0.025em;
-        }
-
-        .tabs {
+        .brand {
             display: flex;
-            gap: 1rem;
+            align-items: center;
+            gap: 0.75rem;
         }
 
-        .tab-btn {
-            background: transparent;
-            color: #94a3b8;
-            border: none;
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            border-radius: 0.375rem;
-            transition: all 0.2s ease;
-        }
-
-        .tab-btn:hover {
-            color: var(--text-color);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .tab-btn.active {
-            color: var(--bg-color);
-        }
-        
-        .tab-btn[data-tab="fp"].active { background-color: var(--accent-danger); }
-        .tab-btn[data-tab="tn"].active { background-color: var(--accent-success); }
-        .tab-btn[data-tab="errors"].active { background-color: var(--accent-warning); }
-
-        .count-badge {
-            display: inline-flex;
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.2);
-            padding: 0.125rem 0.5rem;
-            border-radius: 999px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+        }
+
+        h1 {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .timestamp-badge {
             font-size: 0.75rem;
-            margin-left: 0.5rem;
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.05);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .container {
@@ -87,112 +127,840 @@
             padding: 2rem;
         }
 
+        /* Metrics Panel */
+        .metrics-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+
+        .metric-card.accuracy::before { background: linear-gradient(90deg, #10b981, #3b82f6); }
+        .metric-card.f1::before { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+        .metric-card.precision-recall::before { background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+        .metric-card.far-frr::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+
+        .metric-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .metric-subvalues {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 0.5rem;
+        }
+
+        .metric-subvalue {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-subvalue-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .metric-subvalue-val {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Navigation Toolbar (Tabs & Search/Filter) */
+        .toolbar {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (min-width: 1024px) {
+            .toolbar {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.35rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.02);
+            align-self: flex-start;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+        }
+
+        .tab-btn[data-tab="tp"].active { background-color: var(--accent-tp); box-shadow: 0 4px 12px var(--glow-tp); }
+        .tab-btn[data-tab="tn"].active { background-color: var(--accent-tn); box-shadow: 0 4px 12px var(--glow-tn); }
+        .tab-btn[data-tab="fp"].active { background-color: var(--accent-fp); box-shadow: 0 4px 12px var(--glow-fp); }
+        .tab-btn[data-tab="fn"].active { background-color: var(--accent-fn); box-shadow: 0 4px 12px var(--glow-fn); }
+        .tab-btn[data-tab="errors"].active { background-color: var(--accent-errors); box-shadow: 0 4px 12px var(--glow-errors); }
+
+        .count-badge {
+            background: rgba(0, 0, 0, 0.25);
+            color: rgba(255,255,255,0.85);
+            padding: 0.1rem 0.4rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Search & Controls */
+        .controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-grow: 1;
+            max-width: 500px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.6rem 1rem 0.6rem 2.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Filtering Pillbox */
+        .filter-panel {
+            background: rgba(17, 24, 39, 0.35);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .filter-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 0.5rem;
+        }
+
+        .filter-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            user-select: none;
+        }
+
+        .filter-pill:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-color);
+            border-color: var(--border-hover-color);
+        }
+
+        .filter-pill.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        /* Dynamic Grid & Cards */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 1.5rem;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .card {
-            background-color: var(--card-bg);
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
+            border-radius: 1rem;
             overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
 
         .card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            background: var(--card-hover-bg);
+            border-color: var(--border-hover-color);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
+        }
+
+        .card-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            overflow: hidden;
+            background: #0f172a;
         }
 
         .card-img {
             width: 100%;
-            height: 250px;
+            height: 100%;
             object-fit: cover;
-            border-bottom: 1px solid var(--border-color);
         }
+
+        .card:hover .card-img {
+            transform: scale(1.05);
+        }
+
+        /* Outcome Badge on Card Corner */
+        .outcome-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.375rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        .card[data-type="tp"] .outcome-badge { background: var(--accent-tp); color: #ffffff; }
+        .card[data-type="tn"] .outcome-badge { background: var(--accent-tn); color: #ffffff; }
+        .card[data-type="fp"] .outcome-badge { background: var(--accent-fp); color: #ffffff; }
+        .card[data-type="fn"] .outcome-badge { background: var(--accent-fn); color: #ffffff; }
+        .card[data-type="errors"] .outcome-badge { background: var(--accent-errors); color: #ffffff; }
 
         .card-content {
             padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            flex-grow: 1;
         }
 
-        .card-title {
-            font-size: 0.875rem;
-            color: #94a3b8;
-            margin: 0 0 0.5rem 0;
+        .card-meta {
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
-        .identity-badge {
-            background: var(--bg-color);
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
+        .card-filename {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 120px;
+        }
+
+        .card-id-badge {
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border-color);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #3b82f6;
+            font-weight: 600;
         }
 
-        .attributes {
+        .card-detail-info {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .info-value.match { color: var(--accent-tp); }
+        .info-value.mismatch { color: var(--accent-fp); }
+        .info-value.error { color: var(--accent-errors); }
+
+        .attributes-list {
             display: flex;
             flex-wrap: wrap;
             gap: 0.25rem;
-            margin-top: 0.75rem;
+            margin-top: auto;
         }
 
         .attr-badge {
             font-size: 0.65rem;
-            background: #334155;
-            color: #e2e8f0;
-            padding: 0.125rem 0.375rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            padding: 0.15rem 0.4rem;
             border-radius: 999px;
             text-transform: capitalize;
+            border: 1px solid rgba(255,255,255,0.02);
         }
 
+        /* Detail Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 7, 12, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .modal-content {
+            background: #0f1524;
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        @media (min-width: 768px) {
+            .modal-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .modal-img-column {
+            background: #070a12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .modal-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            max-height: 500px;
+        }
+
+        .modal-info-column {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .modal-header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .modal-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-metrics-table {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .modal-metrics-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        .modal-metrics-row .m-label {
+            color: var(--text-secondary);
+        }
+
+        .modal-metrics-row .m-val {
+            font-weight: 600;
+        }
+
+        .modal-attr-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .modal-attr-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.35rem 0.5rem;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .modal-attr-item.present {
+            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.15);
+            color: #a7f3d0;
+        }
+
+        .modal-attr-icon {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #475569;
+        }
+
+        .modal-attr-item.present .modal-attr-icon {
+            background: var(--accent-tp);
+            box-shadow: 0 0 6px var(--accent-tp);
+        }
+
+        /* Loading & Error States */
         .loading {
-            text-align: center;
-            padding: 4rem;
-            color: #94a3b8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(59, 130, 246, 0.1);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .empty-state {
-            text-align: center;
-            padding: 4rem;
-            color: #94a3b8;
             grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 2rem;
             background: var(--card-bg);
-            border-radius: 0.75rem;
             border: 1px dashed var(--border-color);
+            border-radius: 1rem;
+            color: var(--text-secondary);
+            text-align: center;
         }
 
-        [style*="display: none"] {
-            display: none !important;
+        .empty-state svg {
+            margin-bottom: 1rem;
+            opacity: 0.5;
+            color: var(--text-muted);
         }
+
+        /* Stats Pill top-right */
+        .summary-stats-pills {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .stats-pill {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            color: var(--text-secondary);
+        }
+
+        .stats-pill strong {
+            color: #ffffff;
+        }
+
     </style>
 </head>
 <body>
     <header>
-        <h1>CelebA Evaluation Dashboard</h1>
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="fp">False Positives <span class="count-badge" id="count-fp">0</span></button>
-            <button class="tab-btn" data-tab="tn">True Negatives <span class="count-badge" id="count-tn">0</span></button>
-            <button class="tab-btn" data-tab="errors">Errors <span class="count-badge" id="count-errors">0</span></button>
+        <div class="brand">
+            <div class="brand-logo">C</div>
+            <div>
+                <h1>CelebA Face Auth Evaluation</h1>
+                <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">AI/ML Pipeline Audit</div>
+            </div>
+        </div>
+        
+        <div class="summary-stats-pills">
+            <div class="stats-pill" id="total-registered-pill">Registered: <strong>0</strong></div>
+            <div class="stats-pill" id="total-tested-pill">Tested: <strong>0</strong></div>
+            <div class="timestamp-badge" id="timestamp-badge">UTC: --:--</div>
         </div>
     </header>
 
     <main class="container">
-        <div id="loading" class="loading">Loading dashboard data...</div>
-        
-        <div id="grid-fp" class="grid" style="display: none;"></div>
-        <div id="grid-tn" class="grid" style="display: none;"></div>
-        <div id="grid-errors" class="grid" style="display: none;"></div>
+        <!-- Dashboard Metrics Deck -->
+        <section class="metrics-panel" id="metrics-panel">
+            <!-- Accuracy -->
+            <div class="metric-card accuracy">
+                <div>
+                    <div class="metric-label">System Accuracy</div>
+                    <div class="metric-value" id="val-accuracy">--%</div>
+                </div>
+                <div class="metric-subvalues">
+                    <div class="metric-subvalue">
+                        <span class="metric-subvalue-label">Overall Accuracy</span>
+                        <span class="metric-subvalue-val" id="val-acc-sub">--</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- F1 Score -->
+            <div class="metric-card f1">
+                <div>
+                    <div class="metric-label">F1-Score</div>
+                    <div class="metric-value" id="val-f1">--%</div>
+                </div>
+                <div class="metric-subvalues">
+                    <div class="metric-subvalue">
+                        <span class="metric-subvalue-label">Harmonic Mean</span>
+                        <span class="metric-subvalue-val" id="val-f1-sub">--</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Precision / Recall -->
+            <div class="metric-card precision-recall">
+                <div>
+                    <div class="metric-label">Precision & Recall</div>
+                    <div class="metric-value" id="val-precision" style="font-size: 1.6rem; display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.4rem;">
+                        <span>P: --%</span>
+                        <span style="font-size: 1.2rem; opacity: 0.6; font-weight: 300;">/</span>
+                        <span>R: --%</span>
+                    </div>
+                </div>
+                <div class="metric-subvalues">
+                    <div class="metric-subvalue" style="flex: 1;">
+                        <span class="metric-subvalue-label">Precision</span>
+                        <span class="metric-subvalue-val" id="sub-precision">--</span>
+                    </div>
+                    <div class="metric-subvalue" style="flex: 1;">
+                        <span class="metric-subvalue-label">Recall</span>
+                        <span class="metric-subvalue-val" id="sub-recall">--</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FAR & FRR -->
+            <div class="metric-card far-frr">
+                <div>
+                    <div class="metric-label">Security Metrics</div>
+                    <div class="metric-value" id="val-far" style="font-size: 1.6rem; display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.4rem;">
+                        <span>FAR: --%</span>
+                        <span style="font-size: 1.2rem; opacity: 0.6; font-weight: 300;">/</span>
+                        <span>FRR: --%</span>
+                    </div>
+                </div>
+                <div class="metric-subvalues">
+                    <div class="metric-subvalue" style="flex: 1;">
+                        <span class="metric-subvalue-label">False Accept</span>
+                        <span class="metric-subvalue-val" id="sub-far">--</span>
+                    </div>
+                    <div class="metric-subvalue" style="flex: 1;">
+                        <span class="metric-subvalue-label">False Reject</span>
+                        <span class="metric-subvalue-val" id="sub-frr">--</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Toolbar -->
+        <section class="toolbar">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="tp">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    True Positives <span class="count-badge" id="count-tp">0</span>
+                </button>
+                <button class="tab-btn" data-tab="tn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    True Negatives <span class="count-badge" id="count-tn">0</span>
+                </button>
+                <button class="tab-btn" data-tab="fp">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    False Positives <span class="count-badge" id="count-fp">0</span>
+                </button>
+                <button class="tab-btn" data-tab="fn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    False Negatives <span class="count-badge" id="count-fn">0</span>
+                </button>
+                <button class="tab-btn" data-tab="errors">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Errors <span class="count-badge" id="count-errors">0</span>
+                </button>
+            </div>
+            
+            <div class="controls">
+                <div class="search-wrapper">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="search-input" class="search-input" placeholder="Search filename or ID...">
+                </div>
+            </div>
+        </section>
+
+        <!-- Attribute Filter Pill Panel -->
+        <section class="filter-panel">
+            <span class="filter-title">Filter by Feature:</span>
+            <span class="filter-pill" data-attr="Eyeglasses">Glasses</span>
+            <span class="filter-pill" data-attr="Smiling">Smiling</span>
+            <span class="filter-pill" data-attr="Wearing_Hat">Hat</span>
+            <span class="filter-pill" data-attr="Blurry">Blurry</span>
+            <span class="filter-pill" data-attr="Male">Male</span>
+            <span class="filter-pill" data-attr="Heavy_Makeup">Heavy Makeup</span>
+            <span class="filter-pill" data-attr="Bald">Bald</span>
+            <span class="filter-pill" data-attr="Sideburns">Sideburns</span>
+        </section>
+
+        <!-- Image Grid -->
+        <section>
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading evaluation dataset and generating views...</p>
+            </div>
+            
+            <!-- Shared dynamic grid container -->
+            <div id="grid-container" class="grid" style="display: none;"></div>
+        </section>
     </main>
 
-    <script>
-        let dashboardData = { fp: [], tn: [], errors: [] };
-        let activeTab = 'fp';
+    <!-- Detailed Metadata Modal -->
+    <div class="modal-overlay" id="detail-modal">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="modal-close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <div class="modal-img-column">
+                <img id="modal-img" class="modal-img" src="" alt="Full face preview">
+            </div>
+            
+            <div class="modal-info-column">
+                <div class="modal-header">
+                    <h2 id="modal-filename" class="modal-title">img_000000.jpg</h2>
+                    <span id="modal-identity" class="modal-subtitle">Identity ID: 0</span>
+                </div>
+                
+                <div>
+                    <div class="modal-section-title">Authentication Audit Trace</div>
+                    <div class="modal-metrics-table">
+                        <div class="modal-metrics-row">
+                            <span class="m-label">Test Intent Category</span>
+                            <span class="m-val" id="modal-trace-testtype">True Positive</span>
+                        </div>
+                        <div class="modal-metrics-row">
+                            <span class="m-label">Simulated Account Email</span>
+                            <span class="m-val" id="modal-trace-email">celeb_x@example.com</span>
+                        </div>
+                        <div class="modal-metrics-row">
+                            <span class="m-label">Expected Pipeline Auth Result</span>
+                            <span class="m-val" id="modal-trace-expected" style="color: var(--accent-tp);">SUCCESS</span>
+                        </div>
+                        <div class="modal-metrics-row">
+                            <span class="m-label">Actual API Response</span>
+                            <span class="m-val" id="modal-trace-actual">SUCCESS</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="modal-section-title">CelebA Attribute Vector</div>
+                    <div class="modal-attr-grid" id="modal-attributes">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // Interesting attributes to show as badges
+    <script>
+        let dashboardData = { metrics: {}, tp: [], tn: [], fp: [], fn: [], errors: [] };
+        let activeTab = 'tp';
+        let activeFilters = new Set();
+        let searchQuery = '';
+
+        // All attributes to parse from dataset
         const interestingAttrs = [
             'Eyeglasses', 'Smiling', 'Wearing_Hat', 'Blurry', 
             'Male', 'Heavy_Makeup', 'Bald', 'Sideburns'
@@ -201,97 +969,330 @@
         async function init() {
             try {
                 const response = await fetch('/dashboard_data.json');
-                if (!response.ok) throw new Error('Data not found. Did you run the ETL script?');
+                if (!response.ok) throw new Error('Evaluation data not found. Please run the ETL pipeline script first.');
                 
                 dashboardData = await response.json();
                 
-                document.getElementById('count-fp').textContent = dashboardData.fp.length;
-                document.getElementById('count-tn').textContent = dashboardData.tn.length;
-                document.getElementById('count-errors').textContent = dashboardData.errors.length;
+                // Set default mock metrics if they don't exist in json
+                if (!dashboardData.metrics) {
+                    dashboardData.metrics = calculateClientSideMetrics();
+                }
 
-                renderGrid('fp', dashboardData.fp);
-                renderGrid('tn', dashboardData.tn);
-                renderGrid('errors', dashboardData.errors);
-
+                // Render metrics dashboard
+                renderMetrics(dashboardData.metrics);
+                
+                // Update badge counts
+                updateCategoryBadges();
+                
+                // Initialize default tab
                 document.getElementById('loading').style.display = 'none';
-                showTab(activeTab);
+                document.getElementById('grid-container').style.display = 'grid';
+                
+                renderActiveGrid();
 
             } catch (err) {
                 document.getElementById('loading').innerHTML = `
-                    <div style="color: var(--accent-danger)">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 1rem">
+                    <div style="color: var(--accent-fp); text-align: center;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 1rem">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="8" x2="12" y2="12"></line>
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                        </svg><br>
-                        ${err.message}
+                        </svg>
+                        <h3 style="margin: 0 0 0.5rem 0;">Error Loading Dashboard</h3>
+                        <p style="margin: 0; font-size: 0.875rem; opacity: 0.8;">${err.message}</p>
                     </div>
                 `;
             }
         }
 
-        function createCard(item) {
-            // Extract interesting attributes that are present (value = 1)
-            const badges = interestingAttrs
-                .filter(attr => item.attributes && item.attributes[attr] === 1)
-                .map(attr => `<span class="attr-badge">${attr.replace(/_/g, ' ')}</span>`)
-                .join('');
-
-            return `
-                <div class="card">
-                    <img class="card-img" src="/data_bank/img_align_celeba/img_align_celeba/${item.fileName}" alt="${item.fileName}" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'><rect width=\\'100\\' height=\\'100\\' fill=\\'%23334155\\'/><text x=\\'50\\' y=\\'50\\' font-family=\\'sans-serif\\' font-size=\\'12\\' fill=\\'%2394a3b8\\' text-anchor=\\'middle\\' alignment-baseline=\\'middle\\'>Image not found</text></svg>'">
-                    <div class="card-content">
-                        <p class="card-title">
-                            <span title="File name">${item.fileName}</span>
-                            <span class="identity-badge" title="Identity ID">ID: ${item.identity}</span>
-                        </p>
-                        <div class="attributes">
-                            ${badges}
-                        </div>
-                    </div>
-                </div>
-            `;
+        // Backup client side metrics generator in case old dataset is parsed
+        function calculateClientSideMetrics() {
+            const tp = dashboardData.tp?.length || 0;
+            const tn = dashboardData.tn?.length || 0;
+            const fp = dashboardData.fp?.length || 0;
+            const fn = dashboardData.fn?.length || 0;
+            const errors = dashboardData.errors?.length || 0;
+            const total = tp + tn + fp + fn;
+            
+            return {
+                tp, tn, fp, fn, errors, total,
+                accuracy: total > 0 ? (tp + tn) / total : 0,
+                precision: tp + fp > 0 ? tp / (tp + fp) : 0,
+                recall: tp + fn > 0 ? tp / (tp + fn) : 0,
+                f1: (tp + fp > 0 && tp + fn > 0) ? (2 * (tp / (tp + fp)) * (tp / (tp + fn))) / ((tp / (tp + fp)) + (tp / (tp + fn))) : 0,
+                far: fp + tn > 0 ? fp / (fp + tn) : 0,
+                frr: tp + fn > 0 ? fn / (tp + fn) : 0
+            };
         }
 
-        function renderGrid(id, items) {
-            const container = document.getElementById(`grid-${id}`);
-            if (items.length === 0) {
+        function renderMetrics(metrics) {
+            // General indicators
+            document.getElementById('val-accuracy').textContent = `${(metrics.accuracy * 100).toFixed(1)}%`;
+            document.getElementById('val-acc-sub').textContent = `${metrics.tp + metrics.tn} of ${metrics.total} verified`;
+            
+            document.getElementById('val-f1').textContent = `${(metrics.f1 * 100).toFixed(1)}%`;
+            document.getElementById('val-f1-sub').textContent = `F1 Score Quality: ${(metrics.f1).toFixed(3)}`;
+
+            // Precision & Recall
+            document.getElementById('val-precision').innerHTML = `
+                <span>P: ${(metrics.precision * 100).toFixed(1)}%</span>
+                <span style="font-size: 1rem; opacity: 0.4; font-weight: 300;">/</span>
+                <span>R: ${(metrics.recall * 100).toFixed(1)}%</span>
+            `;
+            document.getElementById('sub-precision').textContent = `TP / (TP+FP): ${(metrics.precision * 100).toFixed(1)}%`;
+            document.getElementById('sub-recall').textContent = `TP / (TP+FN): ${(metrics.recall * 100).toFixed(1)}%`;
+
+            // Security FAR / FRR
+            document.getElementById('val-far').innerHTML = `
+                <span>FAR: ${(metrics.far * 100).toFixed(2)}%</span>
+                <span style="font-size: 1rem; opacity: 0.4; font-weight: 300;">/</span>
+                <span>FRR: ${(metrics.frr * 100).toFixed(1)}%</span>
+            `;
+            document.getElementById('sub-far').textContent = `FP / (FP+TN): ${(metrics.far * 100).toFixed(2)}%`;
+            document.getElementById('sub-frr').textContent = `FN / (FN+TP): ${(metrics.frr * 100).toFixed(1)}%`;
+
+            // Sidebar small badges
+            document.getElementById('total-tested-pill').innerHTML = `Tested: <strong>${metrics.total}</strong>`;
+            // Approximate registered based on loaded data
+            const distinctEnrollId = new Set();
+            ['tp','tn','fp','fn'].forEach(cat => {
+                if (dashboardData[cat]) {
+                    dashboardData[cat].forEach(x => distinctEnrollId.add(x.identity));
+                }
+            });
+            document.getElementById('total-registered-pill').innerHTML = `Identities: <strong>${distinctEnrollId.size}</strong>`;
+            
+            // Timestamp
+            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            document.getElementById('timestamp-badge').textContent = `Audited: ${new Date().toLocaleTimeString(undefined, options)}`;
+        }
+
+        function updateCategoryBadges() {
+            document.getElementById('count-tp').textContent = dashboardData.tp?.length || 0;
+            document.getElementById('count-tn').textContent = dashboardData.tn?.length || 0;
+            document.getElementById('count-fp').textContent = dashboardData.fp?.length || 0;
+            document.getElementById('count-fn').textContent = dashboardData.fn?.length || 0;
+            document.getElementById('count-errors').textContent = dashboardData.errors?.length || 0;
+        }
+
+        function getExpectedAndActualStrings(item, tab) {
+            let expected = 'True';
+            let actual = 'True';
+            let statusColorClass = 'match';
+            
+            if (tab === 'tp') {
+                expected = 'VERIFIED';
+                actual = 'VERIFIED';
+                statusColorClass = 'match';
+            } else if (tab === 'tn') {
+                expected = 'REJECTED';
+                actual = 'REJECTED';
+                statusColorClass = 'match';
+            } else if (tab === 'fp') {
+                expected = 'REJECTED';
+                actual = 'VERIFIED';
+                statusColorClass = 'mismatch';
+            } else if (tab === 'fn') {
+                expected = 'VERIFIED';
+                actual = 'REJECTED';
+                statusColorClass = 'mismatch';
+            } else if (tab === 'errors') {
+                expected = item.testType === 'tp' ? 'VERIFIED' : 'REJECTED';
+                actual = 'ERROR / NO FACE';
+                statusColorClass = 'error';
+            }
+
+            return { expected, actual, statusColorClass };
+        }
+
+        function renderActiveGrid() {
+            const container = document.getElementById('grid-container');
+            const items = dashboardData[activeTab] || [];
+            
+            // Apply filtering
+            const filteredItems = items.filter(item => {
+                // Name or ID Search Match
+                const queryLower = searchQuery.toLowerCase();
+                const matchesSearch = item.fileName.toLowerCase().includes(queryLower) || 
+                                     item.identity.toLowerCase().includes(queryLower);
+                
+                if (!matchesSearch) return false;
+
+                // Attribute filters match
+                for (const filter of activeFilters) {
+                    if (!item.attributes || item.attributes[filter] !== 1) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            if (filteredItems.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                             <circle cx="8.5" cy="8.5" r="1.5"></circle>
                             <polyline points="21 15 16 10 5 21"></polyline>
                         </svg>
-                        <p>No images found in this category.</p>
+                        <h4 style="margin: 0 0 0.5rem 0; color: #ffffff;">No Results Found</h4>
+                        <p style="margin: 0; font-size: 0.85rem; max-width: 320px;">No images match your active filters or search query in this category.</p>
                     </div>
                 `;
                 return;
             }
-            container.innerHTML = items.map(createCard).join('');
+
+            container.innerHTML = filteredItems.map((item, idx) => {
+                const attrsBadges = interestingAttrs
+                    .filter(attr => item.attributes && item.attributes[attr] === 1)
+                    .map(attr => `<span class="attr-badge">${attr.replace(/_/g, ' ')}</span>`)
+                    .slice(0, 3) // Cap at 3 for UI cleanliness
+                    .join('');
+
+                const { expected, actual, statusColorClass } = getExpectedAndActualStrings(item, activeTab);
+
+                return `
+                    <div class="card" data-type="${activeTab}" onclick="openModal('${activeTab}', ${items.indexOf(item)})">
+                        <div class="outcome-badge">${activeTab}</div>
+                        <div class="card-img-wrapper">
+                            <img class="card-img" src="/data_bank/img_align_celeba/img_align_celeba/${item.fileName}" alt="${item.fileName}" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'><rect width=\\'100\\' height=\\'100\\' fill=\\'%230f172a\\'/><text x=\\'50\\' y=\\'50\\' font-family=\\'sans-serif\\' font-size=\\'11\\' fill=\\'%23475569\\' text-anchor=\\'middle\\' alignment-baseline=\\'middle\\'>Image error</text></svg>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-meta">
+                                <span class="card-filename" title="${item.fileName}">${item.fileName}</span>
+                                <span class="card-id-badge" title="Identity ID">ID: ${item.identity}</span>
+                            </div>
+                            
+                            <div class="card-detail-info">
+                                <div class="info-row">
+                                    <span class="info-label">Expected:</span>
+                                    <span class="info-value" style="color: #94a3b8">${expected}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">API Decision:</span>
+                                    <span class="info-value ${statusColorClass}">${actual}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="attributes-list">
+                                ${attrsBadges}
+                                ${item.attributes && Object.values(item.attributes).filter(v=>v===1).length > 3 ? `<span class="attr-badge" style="opacity: 0.6;">+${Object.values(item.attributes).filter(v=>v===1).length - 3}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        function showTab(tabId) {
-            // Update buttons
+        // Tab Switching
+        function setTab(tabId) {
+            activeTab = tabId;
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === tabId);
             });
-
-            // Update grids
-            document.querySelectorAll('.grid').forEach(grid => {
-                grid.style.display = 'none';
-            });
-            document.getElementById(`grid-${tabId}`).style.display = 'grid';
-            
-            activeTab = tabId;
+            renderActiveGrid();
         }
 
-        // Event listeners
+        // Modal Handlers
+        function openModal(tab, idx) {
+            const item = dashboardData[tab][idx];
+            if (!item) return;
+
+            document.getElementById('modal-img').src = `/data_bank/img_align_celeba/img_align_celeba/${item.fileName}`;
+            document.getElementById('modal-filename').textContent = item.fileName;
+            document.getElementById('modal-identity').textContent = `Identity ID: ${item.identity}`;
+            
+            const { expected, actual, statusColorClass } = getExpectedAndActualStrings(item, tab);
+            
+            // Format dynamic trace details
+            document.getElementById('modal-trace-testtype').textContent = item.testType === 'tp' ? 'True Positive (Correct match verification)' : 'True Negative (Impostor rejection verification)';
+            document.getElementById('modal-trace-email').textContent = `celeb_${item.identity}@example.com`;
+            document.getElementById('modal-trace-expected').textContent = expected;
+            
+            // Style Expected Text
+            const expectedTextElement = document.getElementById('modal-trace-expected');
+            if (expected === 'VERIFIED') {
+                expectedTextElement.style.color = 'var(--accent-tp)';
+            } else {
+                expectedTextElement.style.color = 'var(--accent-fp)';
+            }
+
+            const actualTextElement = document.getElementById('modal-trace-actual');
+            actualTextElement.textContent = actual;
+            if (statusColorClass === 'match') {
+                actualTextElement.style.color = 'var(--accent-tp)';
+            } else if (statusColorClass === 'mismatch') {
+                actualTextElement.style.color = 'var(--accent-fp)';
+            } else {
+                actualTextElement.style.color = 'var(--accent-errors)';
+            }
+
+            // Fill attribute grid
+            const attrGrid = document.getElementById('modal-attributes');
+            attrGrid.innerHTML = '';
+            
+            if (item.attributes) {
+                Object.entries(item.attributes).forEach(([attr, val]) => {
+                    const isPresent = val === 1;
+                    const cleanName = attr.replace(/_/g, ' ');
+                    
+                    const div = document.createElement('div');
+                    div.className = `modal-attr-item ${isPresent ? 'present' : ''}`;
+                    div.innerHTML = `
+                        <div class="modal-attr-icon"></div>
+                        <span>${cleanName}</span>
+                    `;
+                    attrGrid.appendChild(div);
+                });
+            } else {
+                attrGrid.innerHTML = '<div style="grid-column: 1/-1; font-size: 0.8rem; color: var(--text-muted);">No attributes loaded for this entry.</div>';
+            }
+
+            document.getElementById('detail-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+        }
+
+        // Setup Event Listeners
         document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => showTab(e.currentTarget.dataset.tab));
+            btn.addEventListener('click', (e) => setTab(e.currentTarget.dataset.tab));
         });
 
-        // Start
+        // Search Input
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderActiveGrid();
+        });
+
+        // Attribute pills
+        document.querySelectorAll('.filter-pill').forEach(pill => {
+            pill.addEventListener('click', (e) => {
+                const attr = e.currentTarget.dataset.attr;
+                if (activeFilters.has(attr)) {
+                    activeFilters.delete(attr);
+                    e.currentTarget.classList.remove('active');
+                } else {
+                    activeFilters.add(attr);
+                    e.currentTarget.classList.add('active');
+                }
+                renderActiveGrid();
+            });
+        });
+
+        // Modal events
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('detail-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'detail-modal') closeModal();
+        });
+        
+        // Escape key to close modal
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Initialize App
         init();
     </script>
 </body>

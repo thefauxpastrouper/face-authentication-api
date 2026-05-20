@@ -7,7 +7,7 @@ import { getFaceDescriptor } from './faceApi';
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
-const MATCH_THRESHOLD = 0.42; // tweaked for strictness
+const MATCH_THRESHOLD = 0.5; // tweaked for strictness
 
 export async function register(req: Request, res: Response): Promise<any> {
   try {

@@ -270,7 +270,8 @@ async function runEtl() {
   const registeredArray = Array.from(successfullyRegistered);
 
   console.log(`  Total test images available: ${testItems.length}`);
-  console.log(`  Testing (capped):            ${cappedTestItems.length}\n`);
+  console.log(`  Testing images (capped):     ${cappedTestItems.length}`);
+  console.log(`  Total Auth Tests to run:     ${cappedTestItems.length * 2} (1 TP + 1 TN per image)\n`);
 
   const authResults: AuthResult[] = [];
 
@@ -370,8 +371,11 @@ async function runEtl() {
   };
 
   const dashboardData = {
-    fp: authResults.filter(r => r.testType === "tn" && r.actual === true),
+    metrics: overall,
+    tp: authResults.filter(r => r.testType === "tp" && r.actual === true),
     tn: authResults.filter(r => r.testType === "tn" && r.actual === false),
+    fp: authResults.filter(r => r.testType === "tn" && r.actual === true),
+    fn: authResults.filter(r => r.testType === "tp" && r.actual === false),
     errors: authResults.filter(r => r.actual === null)
   };
   writeFileSync("./public/dashboard_data.json", JSON.stringify(dashboardData, null, 2));
